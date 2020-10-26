@@ -29,7 +29,7 @@ var routes = [
     icon: "ni ni-planet text-blue",
     component: Icons,
     layout: "/admin",
-    enabled: true
+    enabled: false
   },
   {
     path: "/maps",
@@ -53,7 +53,7 @@ var routes = [
     icon: "ni ni-bullet-list-67 text-red",
     component: Tables,
     layout: "/admin",
-    enabled: true
+    enabled: false
   },
   {
     path: "/login",
