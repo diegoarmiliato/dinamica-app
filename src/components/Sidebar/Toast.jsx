@@ -17,7 +17,13 @@ const toastMessage = (type, title, message) => {
     draggable: true,
     progress: undefined,
   };
-const fullmessage = <><b>{title}</b><br></br><p>{message}</p></>;
+
+  const splitMessage = message.split('\n').map((line, key) => {
+    return <p key={key}>{line}</p>
+  });
+  
+  const fullmessage = <><b>{title}</b><br/>{splitMessage}</>;
+
   switch (type) {
     case toastTypes.success:
       toast.success(fullmessage, config);

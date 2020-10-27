@@ -9,7 +9,7 @@ import { loginActions } from "store/reducers/login";
 
 import 'assets/css/app.css';
 import Loading from "views/examples/Loading";
-import { Toast } from "components/Sidebar/Toast";
+import { Toast, toastMessage, toastTypes } from "components/Sidebar/Toast";
 
 function App() {
 
@@ -18,9 +18,15 @@ function App() {
   useEffect(() => {
     api.post('/login')
     .then((res) => {      
-      if (res.data.status) {        
-        dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, firstName: res.data.firstName, lastName: res.data.lastName} });
-        dispatch({ type: loginActions.SET_LOGIN_PASSWORD, payload: ''});
+      if (res.data.status) {    
+        if (res.data.orgUnit === 'Funcionarios') {    
+          dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, firstName: res.data.firstName, lastName: res.data.lastName} });
+          dispatch({ type: loginActions.SET_LOGIN_PASSWORD, payload: ''});
+        } else {
+          api.post('/logoff');
+          dispatch({ type: loginActions.LOGOFF});
+          toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
+        }
         // dispatch({ type: 'LOADING_OFF'});
       }
     })

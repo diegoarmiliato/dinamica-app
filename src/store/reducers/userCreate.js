@@ -1,17 +1,17 @@
-const userActions = {
-  SET_USER_USERNAME: 'SET_USER_USERNAME',
-  SET_USER_PASSWORD: 'SET_USER_PASSWORD',
-  SET_USER_FIRSTNAME: 'SET_USER_FIRSTNAME',
-  SET_USER_LASTNAME: 'SET_USER_LASTNAME',
-  COLLAPSE_CREATEUSERCARD: 'COLLAPSE_CREATEUSERCARD',
+const userCreateActions = {
+  SET_CREATEUSE_USERNAME: 'SET_CREATEUSE_USERNAME',
+  SET_CREATEUSE_PASSWORD: 'SET_CREATEUSE_PASSWORD',
+  SET_CREATEUSE_FIRSTNAME: 'SET_CREATEUSE_FIRSTNAME',
+  SET_CREATEUSE_LASTNAME: 'SET_CREATEUSE_LASTNAME',
+  COLLAPSE_CREATEUSE_RCARD: 'COLLAPSE_CREATEUSERCARD',
   SET_USER_CREATED: 'SET_USER_CREATED'
 }
 
-const userInitialState = {
-  username: '1234',
-  password: 'sysadmin',
-  firstName: 'Diego',
-  lastName: 'Armiliato',
+const userCreateInitialState = {
+  username: '',
+  password: '',
+  firstName: '',
+  lastName: '',
   createCard: false,  
   proposeUser: true,
   validUser: true,
@@ -21,19 +21,19 @@ const userInitialState = {
   submitEnabled: false
 }
 
-const userReducer = (state, action) => {
+const userCreateReducer = (state, action) => {
   switch (action.type) {
-    case userActions.SET_USER_USERNAME:
+    case userCreateActions.SET_CREATEUSE_USERNAME:
       return { ...state, username: action.payload, validUser: (action.payload.length > 0), submitEnabled: validSubmit({ ...state, username: action.payload }) }
-    case userActions.SET_USER_PASSWORD:
+    case userCreateActions.SET_CREATEUSE_PASSWORD:
       return { ...state, password: action.payload, validPass: (action.payload.length > 0), submitEnabled: validSubmit({ ...state, password: action.payload }) }
-    case userActions.SET_USER_FIRSTNAME:
+    case userCreateActions.SET_CREATEUSE_FIRSTNAME:
       return { ...state, firstName: action.payload, validFirst: (action.payload.length > 0), submitEnabled: validSubmit({ ...state, firstName: action.payload }) }
-    case userActions.SET_USER_LASTNAME:
+    case userCreateActions.SET_CREATEUSE_LASTNAME:
       return { ...state, lastName: action.payload, validLast: (action.payload.length > 0), submitEnabled: validSubmit({ ...state, lastName: action.payload }) }
-    case userActions.COLLAPSE_CREATEUSERCARD:
+    case userCreateActions.COLLAPSE_CREATEUSERCARD:
       return { ...state, createCard: !state.createCard }
-    case userActions.SET_USER_CREATED:
+    case userCreateActions.SET_USER_CREATED:
       return { ...state, username: '', password: '', firstName: '', lastName: '', submitEnabled: validSubmit({ ...state, username: ''}) }
     default:
       return state;
@@ -49,4 +49,4 @@ const validSubmit = (state) => {
   return false;
 }
 
-export { userActions, userReducer, userInitialState };
+export { userCreateActions, userCreateReducer, userCreateInitialState };

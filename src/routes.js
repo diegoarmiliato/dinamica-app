@@ -1,7 +1,7 @@
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Maps from "views/examples/Maps.js";
-import Login from "views/examples/Login.js";
+import Login from "views/examples/Login.jsx";
 import Tables from "views/examples/Tables.js";
 import Users from "views/examples/Users.jsx";
 import Icons from "views/examples/Icons.js";
@@ -53,7 +53,7 @@ var routes = [
     icon: "ni ni-bullet-list-67 text-red",
     component: Tables,
     layout: "/admin",
-    enabled: false
+    enabled: true
   },
   {
     path: "/login",

@@ -42,16 +42,23 @@ function Login() {
     api.post('/login', {} ,config)
       .then((res) => {
         if (res.data.status) {
-          dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, firstName: res.data.firstName, lastName: res.data.lastName} });
-          dispatch({ type: loginActions.SET_LOGIN_PASSWORD, payload: ''});
+          if (res.data.orgUnit === 'Funcionarios') {
+            dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, 
+              firstName: res.data.firstName, 
+              lastName: res.data.lastName, 
+              orgUnit: res.data.orgUnit } });              
+          } else {
+            api.post('/logoff');
+            dispatch({ type: loginActions.LOGOFF});
+            toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
+          }
         } else {
           dispatch({ type: loginActions.LOGOFF});  
           toastMessage(toastTypes.error, 'Erro', res.data.message);
-          console.log(res.data.message);
         }
       })
       .catch((err) => {
-        toastMessage(toastTypes.error, 'Erro', err);
+        toastMessage(toastTypes.error, 'Erro', err.message);
       })
       .finally(() => dispatch({ type: 'LOADING_OFF'}));
   }
@@ -85,12 +92,12 @@ function Login() {
               <FormGroup className="mb-3">
                   <AvField id="username" name="username" type="text" placeholder="nome de usuário" 
                            validate={{ required: { value: true, errorMessage: "O campo usuário é obrigatório"}}}
-                           onChange={handleChange} autocomplete={state.login.autoComplete ? 'on' : 'new-username'}/>
+                           onChange={handleChange} autoComplete={state.login.autoComplete ? 'on' : 'new-username'}/>
               </FormGroup>
               <FormGroup>
                   <AvField id="password" name="password" type="password" placeholder="senha" 
                            validate={{ required: { value: true, errorMessage: "O campo senha é obrigatório"}}}
-                           onChange={handleChange} autocomplete={state.login.autoComplete ? 'on' : 'new-password'}/>
+                           onChange={handleChange} autoComplete={state.login.autoComplete ? 'on' : 'new-password'}/>
               </FormGroup>
               <div className="custom-control custom-control-alternative custom-checkbox">
                 <input className="custom-control-input" id="rememberMe" type="checkbox" onChange={handleChange} checked={state.login.autoComplete}/>

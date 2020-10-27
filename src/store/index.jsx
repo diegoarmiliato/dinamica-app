@@ -1,12 +1,14 @@
 import React, { createContext, useReducer } from 'react';
 import { loginReducer, loginInitialState } from './reducers/login';
 import { loadingReducer, loadingInitialState } from './reducers/loading';
-import { userReducer, userInitialState } from './reducers/user';
+import { userCreateReducer, userCreateInitialState } from './reducers/userCreate';
+import { userListReducer, userListInitialState } from './reducers/userList';
 
 export const INITIAL_STATE = {
   login: loginInitialState,
   loading: loadingInitialState,
-  user: userInitialState
+  userCreate: userCreateInitialState,
+  userList: userListInitialState
 }
 
 const Context = createContext({
@@ -14,10 +16,11 @@ const Context = createContext({
     dispatch: () => null
   });
 
-const mainReducer = ({ login, loading, user}, action) => ({
+const mainReducer = ({ login, loading, userCreate, userList}, action) => ({
   login: loginReducer(login, action),
   loading: loadingReducer(loading, action),
-  user: userReducer(user, action)
+  userCreate: userCreateReducer(userCreate, action),
+  userList: userListReducer(userList, action)
 });
 
 const Provider = ( { children } ) => {
