@@ -1,8 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import Cookies from 'universal-cookie';
 
-import { Button, Card, CardBody, FormGroup, Col } from "reactstrap";
-import { AvForm, AvField } from 'availity-reactstrap-validation';
+import { Form, Input, Button, Card, CardBody, FormGroup, Col, InputGroup, InputGroupAddon, InputGroupText, FormFeedback } from "reactstrap";
 
 import { Context } from "store";
 import { loginActions } from "store/reducers/login";
@@ -14,12 +13,13 @@ function Login() {
 
   const { state, dispatch } = useContext(Context);
 
+  const { login } = state;
+
   const cookies = new Cookies();
 
   useEffect(() => {  
     const autoComplete = cookies.get('autoComplete');    
     if (autoComplete) {
-      console.log(autoComplete);
       dispatch({ type: loginActions.SET_LOGIN_AUTOCOMPLETE, payload: autoComplete === 'true' ? true : false });
     } else { 
       dispatch({ type: loginActions.SET_LOGIN_AUTOCOMPLETE, payload: false });
@@ -27,44 +27,48 @@ function Login() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
   
-  const handleValidSubmit = () => {
-    dispatch({ type: 'LOADING_ON'});
-    const username = state.login.username;
-    const password = state.login.password;
-    const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64')
-    const config = {
-      headers: {
-        apiHeaders,
-        'Authorization': `Basic ${token}`
-      },
-      withCredentials: true
-    }
-    api.post('/login', {} ,config)
-      .then((res) => {
-        if (res.data.status) {
-          if (res.data.orgUnit === 'Funcionarios') {
-            dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, 
-              firstName: res.data.firstName, 
-              lastName: res.data.lastName, 
-              orgUnit: res.data.orgUnit } });              
-          } else {
-            api.post('/logoff');
-            dispatch({ type: loginActions.LOGOFF});
-            toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
-          }
-        } else {
-          dispatch({ type: loginActions.LOGOFF});  
-          toastMessage(toastTypes.error, 'Erro', res.data.message);
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+    if (login.validUser && login.validPass) {
+      if (login.username.length > 0 && login.password.length > 0) {
+        dispatch({ type: 'LOADING_ON'});
+        const username = login.username;
+        const password = login.password;
+        const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64')
+        const config = {
+          headers: {
+            apiHeaders,
+            'Authorization': `Basic ${token}`
+          },
+          withCredentials: true
         }
-      })
-      .catch((err) => {
-        toastMessage(toastTypes.error, 'Erro', err.message);
-      })
-      .finally(() => dispatch({ type: 'LOADING_OFF'}));
+        api.post('/login', {} ,config)
+          .then((res) => {
+            if (res.data.status) {
+              if (res.data.orgUnit === 'Funcionarios') {
+                dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, 
+                  firstName: res.data.firstName, 
+                  lastName: res.data.lastName, 
+                  orgUnit: res.data.orgUnit } });              
+              } else {
+                api.post('/logoff');
+                dispatch({ type: loginActions.LOGOFF});
+                toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
+              }
+            } else {
+              dispatch({ type: loginActions.LOGOFF});  
+              toastMessage(toastTypes.error, 'Erro', res.data.message);
+            }
+          })
+          .catch((err) => toastMessage(toastTypes.error, 'Erro', err.message))
+          .finally(() => dispatch({ type: 'LOADING_OFF'}));
+      }
+    }
   }
 
-  const handleChange = (evt, value) => {    
-    switch (evt.target.id) {
+  const handleChange = (evt) => {
+    const { id, value, checked } = evt.target;  
+    switch (id) {
       case 'username':
         dispatch({ type: loginActions.SET_LOGIN_USERNAME, payload: value});
         break;
@@ -72,8 +76,8 @@ function Login() {
         dispatch({ type: loginActions.SET_LOGIN_PASSWORD, payload: value});
         break;
       case 'rememberMe':
-        cookies.set('autoComplete', evt.target.checked);
-        dispatch({ type: loginActions.SET_LOGIN_AUTOCOMPLETE, payload: evt.target.checked });
+        cookies.set('autoComplete', checked);
+        dispatch({ type: loginActions.SET_LOGIN_AUTOCOMPLETE, payload: checked });
         break;
       default:
         break;
@@ -88,27 +92,43 @@ function Login() {
             <div className="text-center text-muted mb-4">
               <small>Preencha suas credenciais</small>
             </div>
-            <AvForm role="form" onValidSubmit={handleValidSubmit} autoComplete={state.login.autoComplete ? 'on' : 'new-off'}>
+            <Form role="form" onSubmit={handleSubmit} autoComplete={login.autoComplete ? 'on' : 'new-off'}>
               <FormGroup className="mb-3">
-                  <AvField id="username" name="username" type="text" placeholder="nome de usuário" 
-                           validate={{ required: { value: true, errorMessage: "O campo usuário é obrigatório"}}}
-                           onChange={handleChange} autoComplete={state.login.autoComplete ? 'on' : 'new-username'}/>
+              <InputGroup className="input-group-alternative">
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      <i className="ni ni-email-83" />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                    <Input id="username" name="username" type="text" placeholder="nome de usuário" 
+                           onChange={handleChange} autoComplete={login.autoComplete ? 'on' : 'new-username'}
+                           invalid={!login.validUser} valid={!login.validUser}/>
+                    <FormFeedback tooltip>O usuário é obrigatório</FormFeedback>
+                </InputGroup>
               </FormGroup>
               <FormGroup>
-                  <AvField id="password" name="password" type="password" placeholder="senha" 
-                           validate={{ required: { value: true, errorMessage: "O campo senha é obrigatório"}}}
-                           onChange={handleChange} autoComplete={state.login.autoComplete ? 'on' : 'new-password'}/>
+                <InputGroup className="input-group-alternative">
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      <i className="ni ni-lock-circle-open" />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                    <Input id="password" name="password" type="password" placeholder="senha" 
+                           onChange={handleChange} autoComplete={login.autoComplete ? 'on' : 'new-password'}
+                           invalid={!login.validPass} valid={!login.validPass}/>
+                    <FormFeedback tooltip>A senha é obrigatória</FormFeedback>         
+                </InputGroup>
               </FormGroup>
               <div className="custom-control custom-control-alternative custom-checkbox">
-                <input className="custom-control-input" id="rememberMe" type="checkbox" onChange={handleChange} checked={state.login.autoComplete}/>
+                <input className="custom-control-input" id="rememberMe" type="checkbox" onChange={handleChange} checked={login.autoComplete}/>
                 <label className="custom-control-label" htmlFor="rememberMe">
                   <span className="text-muted">Lembrar-me</span>
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="submit">Login</Button>
+                <Button className="my-4" color="primary" type="submit" disabled={!login.submitEnabled}>Login</Button>
               </div>
-            </AvForm>
+            </Form>
           </CardBody>
         </Card>        
       </Col>
