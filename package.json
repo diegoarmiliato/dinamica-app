@@ -19,6 +19,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "prod": "serve --ssl-cert ./.cert/localhost.crt --ssl-key ./.cert/localhost.key build",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "compile-sass": "node-sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.css",
     "minify-sass": "node-sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.min.css --output-style compressed",
@@ -50,7 +51,6 @@
     "react-google-maps": "9.4.5",
     "react-router-dom": "5.1.2",
     "react-scripts": "^3.4.0",
-    "react-strap-table": "^1.0.7",
     "react-toastify": "^6.0.9",
     "reactstrap": "8.4.1",
     "universal-cookie": "^4.0.4"

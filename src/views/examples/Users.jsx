@@ -2,7 +2,6 @@
 import React, { useContext, useEffect } from "react";
 import { userCreateActions } from 'store/reducers/userCreate';
 import { userListActions } from 'store/reducers/userList';
-import ServerTable from 'react-strap-table';
 
 // reactstrap components
 import {
@@ -14,15 +13,12 @@ import {
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  Media,
   Pagination,
   PaginationItem,
   PaginationLink,
-  Progress,
   Table,
   Container,
   Row,
-  UncontrolledTooltip,
   Col,
   CardBody,
   FormGroup,
@@ -56,7 +52,8 @@ function Users(props) {
       if (res.data.status) {    
         dispatch({ type: userListActions.SET_USERLIST_FULL, payload: res.data.userList
                                                             .filter((user) => user.orgUnit === 'Alunos')
-                                                            .map((user) => { return { ...user, active: user.active ? 'ativo' : 'bloqueado' } })});        
+                                                            .sort((a,b) =>  a.firstName < b.firstName ? -1 : a.firstName > b.firstName ? 1 : 0)
+                                                            .map((user) => { return { ...user, active: user.active ? 'ativo' : 'bloqueado' } })});
       } else {
         toastMessage(toastTypes.error, 'Erro', res.data.message);
       }
@@ -94,7 +91,7 @@ function Users(props) {
     }    
   }
 
-  const handleChange = (evt) => {
+  const handleInputChange = (evt) => {
     const value = evt.target.value
     switch(evt.target.id) {
       case 'input-firstName':                        
@@ -175,6 +172,10 @@ function Users(props) {
     return result;
   }
 
+  const handleUserLock = (username, status) => {
+    console.log(username);
+  }
+
   const widthColumns = {
     username: { width: '15%' },
     firstName: { width: '20%' },
@@ -209,7 +210,7 @@ function Users(props) {
                           <FormGroup>
                             <label className="form-control-label" htmlFor="input-firstName">Nome</label>                            
                             <Input id="input-firstName" name="crtform-firstName" type="text" placeholder="primeiro nome" 
-                                   value={userCreate.firstName} onChange={handleChange} autoComplete="new-firstName"
+                                   value={userCreate.firstName} onChange={handleInputChange} autoComplete="new-firstName"
                                    invalid={!userCreate.validFirst} valid={!userCreate.validFirst}/>
                             <FormFeedback style={formFeedbackStyle} tooltip>O nome é obrigatório</FormFeedback>
                           </FormGroup>
@@ -218,7 +219,7 @@ function Users(props) {
                           <FormGroup>
                             <label className="form-control-label" htmlFor="input-lastName">Sobrenome</label>
                             <Input id="input-lastName" name="crtform-lastName" type="text" placeholder="sobrenome completo" 
-                                   value={userCreate.lastName} onChange={handleChange} autoComplete="new-lastName"
+                                   value={userCreate.lastName} onChange={handleInputChange} autoComplete="new-lastName"
                                    invalid={!userCreate.validLast} valid={!userCreate.validLast}/>
                             <FormFeedback style={formFeedbackStyle} tooltip>O sobrenome é obrigatório</FormFeedback>
                           </FormGroup>
@@ -229,7 +230,7 @@ function Users(props) {
                           <FormGroup>
                             <label className="form-control-label" htmlFor="input-username">Usuário</label>
                             <Input id="input-username" name="crtform-username" type="text" placeholder="nome de usuário" 
-                                   value={userCreate.username} onChange={handleChange} autoComplete="new-username"
+                                   value={userCreate.username} onChange={handleInputChange} autoComplete="new-username"
                                    invalid={!userCreate.validUser} valid={!userCreate.validUser}/>
                                     <FormFeedback style={formFeedbackStyle} tooltip>O nome do usuário é obrigatório e deve conter apenas números</FormFeedback>
                           </FormGroup>
@@ -238,7 +239,7 @@ function Users(props) {
                           <FormGroup>
                             <label className="form-control-label" htmlFor="input-password">Senha</label>
                             <Input id="input-password" name="crtform-password" type="password" placeholder="senha" 
-                                   value={userCreate.password} onChange={handleChange} autoComplete="new-password"
+                                   value={userCreate.password} onChange={handleInputChange} autoComplete="new-password"
                                    invalid={!userCreate.validPass} valid={!userCreate.validPass}/>
                             <FormFeedback style={formFeedbackStyle} tooltip>A senha é obrigatória</FormFeedback>
                           </FormGroup>
@@ -269,7 +270,7 @@ function Users(props) {
                         <span className="input-group-text">
                           <i className="fas fa-search" />                          
                         </span>                      
-                        <Input id="input-search" placeholder="Search" type="text" value={userList.filter} onChange={handleChange}/>
+                        <Input id="input-search" placeholder="Search" type="text" value={userList.filter} onChange={handleInputChange}/>
                       </div>                  
                     </div>
                   {/* </Col> */}
@@ -278,21 +279,16 @@ function Users(props) {
               <Table className="align-items-center table-flush" size="sm" hover responsive>
                 <thead className="thead-light">
                   <tr>
-                    <th scope="col" style={widthColumns.username}>Usuário</th>
-                    <th scope="col" style={widthColumns.firstName}>Nome</th>
-                    <th scope="col" style={widthColumns.lastname}>Sobrenome</th>
-                    <th scope="col" style={widthColumns.active}>Status</th>
-                    <th scope="col" style={widthColumns.options}/>
+                    <th className="noUi-target" scope="col" style={widthColumns.username}>Usuário</th>
+                    <th className="noUi-target" scope="col" style={widthColumns.firstName}>Nome<i className="fas fa-sort-down"/></th>
+                    <th className="noUi-target" scope="col" style={widthColumns.lastname}>Sobrenome</th>
+                    <th className="noUi-target" scope="col" style={widthColumns.active}>Status</th>
+                    <th className="noUi-target" scope="col" style={widthColumns.options}/>
                   </tr>
                 </thead>
                 <tbody>
                   {userList.users
-                    // .filter((user) => (Object.values(user).find(res => res.includes(userList.filter)) ? user : undefined))
-                    .filter((user) => (Object.values(user).find((res) => {
-                      const regex = new RegExp(userList.filter, 'i'); 
-                      return regex.test(res) ? user : undefined;
-                    })))
-                    .slice(0, userList.numberEntries)
+                    .slice(((userList.currentPage-1)*userList.numberEntries), ((userList.currentPage-1)*userList.numberEntries)+userList.numberEntries)
                     .map((user, key) => {
                       return(
                         <tr key={key}>
@@ -316,7 +312,7 @@ function Users(props) {
                                 <i className="fas fa-ellipsis-v" />
                               </DropdownToggle>
                               <DropdownMenu className="dropdown-menu-arrow" right>
-                                <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>{user.active === 'ativo' ? 'Bloquear' : 'Ativar'}</DropdownItem>
+                                <DropdownItem href="#pablo" onClick={() => handleUserLock(user.username, user.active)}>{user.active === 'ativo' ? 'Bloquear' : 'Ativar'}</DropdownItem>
                                 <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>Alterar Senha</DropdownItem>
                               </DropdownMenu>
                             </UncontrolledDropdown>
@@ -328,24 +324,35 @@ function Users(props) {
               <CardFooter className="py-4">
                 <nav aria-label="...">
                   <Pagination className="pagination justify-content-end mb-0" listClassName="justify-content-end mb-0">
-                    <PaginationItem className="disabled">
+                    <PaginationItem className={userList.currentPage == 1 ? 'disabled' : 'enabled'}>
                       <PaginationLink href="#pablo" onClick={e => e.preventDefault()} tabIndex="-1">
                         <i className="fas fa-angle-left" />
                         <span className="sr-only">Previous</span>
                       </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem className="active">
-                      <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>
-                        2<span className="sr-only">(current)</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
+                    </PaginationItem>                    
+                    {[...Array(userList.pageCount)].map((it, key) => {
+                      let valid = () => {
+                        if (userList.currentPage <= 2 && key < 5) {
+                          return true;                        
+                        } else if  (userList.currentPage >= userList.pageCount - 1 && key > userList.pageCount - 6) {
+                          return true
+                        } else if (userList.currentPage < userList.pageCount - 1 && userList.currentPage > 2 && 
+                                   key >= userList.currentPage - 3 && key <= userList.currentPage + 1) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }
+                      if (valid()) {
+                        const idx = key + 1;                                 
+                        return (
+                          <PaginationItem key={idx} className={idx === userList.currentPage ? 'active' : undefined}>
+                            <PaginationLink onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: idx})}>{idx}</PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+                    })}                    
+                    <PaginationItem className={userList.currentPage === userList.pageCount ? 'disabled' : 'enabled'}>
                       <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>
                         <i className="fas fa-angle-right" />
                         <span className="sr-only">Next</span>
