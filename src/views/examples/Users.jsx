@@ -45,9 +45,9 @@ function Users(props) {
     position: 'inherit'
   }
 
-  useEffect(() => {
+  const queryUsers = () => {
     dispatch({ type: 'LOADING_ON'})
-    api.get('/listUsers')
+    api.get('/users')
     .then((res) => {   
       if (res.data.status) {    
         dispatch({ type: userListActions.SET_USERLIST_FULL, payload: res.data.userList
@@ -58,8 +58,13 @@ function Users(props) {
         toastMessage(toastTypes.error, 'Erro', res.data.message);
       }
     })
-    .finally(() => dispatch({ type: 'LOADING_OFF'}));
-  }, [dispatch]);
+    .finally(() => dispatch({ type: 'LOADING_OFF'}));    
+  }
+
+  useEffect(() => {
+    queryUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -74,11 +79,12 @@ function Users(props) {
           orgUnit: "Alunos",
           mailDomain: "dinamica.net"
         }
-        api.put('/addUser', body)
+        api.post('/users', body)
         .then((res) => {      
           if (res.data.status) {
             toastMessage(toastTypes.success, 'Sucesso', `Criado usuário ${body.username} para o aluno ${body.firstName} ${body.lastName}`);
             dispatch({ type: userCreateActions.SET_USER_CREATED });
+            queryUsers();
           } else {
             toastMessage(toastTypes.error, 'Erro', res.data.message);
           }
@@ -173,7 +179,24 @@ function Users(props) {
   }
 
   const handleUserLock = (username, status) => {
-    console.log(username);
+    dispatch({ type: 'LOADING_ON'});
+    const body = {
+      username: userCreate.username,
+      active: status === 'ativo' ? false : true
+    }
+    api.put('/users', body)
+    .then((res) => {      
+      if (res.data.status) {
+        const msg = status === 'ativo' ? 'bloqueado' : 'desbloqueado';
+        toastMessage(toastTypes.success, 'Sucesso', `Usuário ${body.username} ${msg}`);
+      } else {
+        toastMessage(toastTypes.error, 'Erro', res.data.message);
+      }
+    })
+    .catch((err) => {
+      toastMessage(toastTypes.error, 'Erro', err.message);
+    })
+    .finally(() => dispatch({ type: 'LOADING_OFF'}));
   }
 
   const widthColumns = {
@@ -324,8 +347,8 @@ function Users(props) {
               <CardFooter className="py-4">
                 <nav aria-label="...">
                   <Pagination className="pagination justify-content-end mb-0" listClassName="justify-content-end mb-0">
-                    <PaginationItem className={userList.currentPage == 1 ? 'disabled' : 'enabled'}>
-                      <PaginationLink href="#pablo" onClick={e => e.preventDefault()} tabIndex="-1">
+                    <PaginationItem className={userList.currentPage === 1 ? 'disabled' : 'enabled'}>
+                      <PaginationLink href="#pablo" onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: userList.currentPage-1})} tabIndex="-1">
                         <i className="fas fa-angle-left" />
                         <span className="sr-only">Previous</span>
                       </PaginationLink>
@@ -353,7 +376,7 @@ function Users(props) {
                       }
                     })}                    
                     <PaginationItem className={userList.currentPage === userList.pageCount ? 'disabled' : 'enabled'}>
-                      <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>
+                      <PaginationLink href="#pablo" onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: userList.currentPage+1})}>
                         <i className="fas fa-angle-right" />
                         <span className="sr-only">Next</span>
                       </PaginationLink>

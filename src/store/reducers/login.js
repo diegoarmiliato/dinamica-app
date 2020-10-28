@@ -11,26 +11,38 @@ const loginInitialState = {
   firstName: '',
   lastName: '',
   password: '',
+  validUser: true,
+  validPass: true,
   loggedOn: false,
-  autoComplete: false
+  autoComplete: false,
+  submitEnabled: false
 }
 
 const loginReducer = (state, action) => {
-    switch (action.type) {
+    const { payload, type } = action;
+    switch (type) {
       case loginActions.SET_LOGIN_USERNAME:
-        return { ...state, username: action.payload }     
+        return { ...state, username: payload, validUser: (payload.length > 0), submitEnabled: validSubmit({ ...state, username: payload }) }     
       case loginActions.SET_LOGIN_PASSWORD:
-        return { ...state, password: action.payload }    
+        return { ...state, password: payload, validPass: (payload.length > 0), submitEnabled: validSubmit({ ...state, password: payload}) }    
       case loginActions.SET_LOGIN_AUTOCOMPLETE:
-        console.log(action);
-        return { ...state, autoComplete: action.payload }      
+        return { ...state, autoComplete: payload }      
       case loginActions.LOGIN:
-        return { ...state, loggedOn: true, ...action.payload }     
+        return { ...state, loggedOn: true, ...payload }     
       case loginActions.LOGOFF:
         return { ...state, loggedOn: false }     
       default:
         return state;
     }
+  }
+
+  const validSubmit = (state) => {
+    if (state.username && state.password) {
+      if (state.username.length > 0 && state.password.length > 0) {
+        return true
+      }
+    }
+    return false;
   }
 
 export { loginActions, loginReducer, loginInitialState };

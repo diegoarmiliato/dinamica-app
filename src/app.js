@@ -27,10 +27,11 @@ function App() {
           dispatch({ type: loginActions.LOGOFF});
           toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
         }
-        // dispatch({ type: 'LOADING_OFF'});
       }
     })
+    .catch((err) => toastMessage(toastTypes.error, 'Erro', err.message))
     .finally(() => dispatch({ type: 'LOADING_OFF'}));
+    // dispatch({ type: 'LOADING_OFF'});
   }, [dispatch]);
 
   const secureRoute = (props) => {
