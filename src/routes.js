@@ -29,7 +29,7 @@ var routes = [
     icon: "ni ni-planet text-blue",
     component: Icons,
     layout: "/admin",
-    enabled: true
+    enabled: false
   },
   {
     path: "/maps",
