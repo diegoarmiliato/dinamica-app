@@ -3,7 +3,8 @@ const userListActions = {
   SET_USERLIST_ENTRIES: 'SET_USERLIST_ENTRIES',
   SET_USERLIST_PAGE: 'SET_USERLIST_PAGE',
   SET_USERLIST_FILTER: 'SET_USERLIST_FILTER',
-  SET_USERLIST_PAGECOUNT: 'SET_USERLIST_PAGECOUNT'
+  SET_USERLIST_PAGECOUNT: 'SET_USERLIST_PAGECOUNT',
+  SET_USERLIST_ACTIVE: 'SET_USERLIST_ACTIVE'
 }
 
 const userListInitialState = {
@@ -12,24 +13,40 @@ const userListInitialState = {
   numberEntries: 10,
   currentPage: 1,
   pageCount: 1,
-  filter: ''
+  filter: '',  
 }
 
 const userListReducer = (state, action) => {
-  switch (action.type) {
+  const { type, payload } = action;
+  switch (type) {
     case userListActions.SET_USERLIST_FULL:
-      const pageCountList = getPageCount(action.payload.length, state.numberEntries);
-      return { ...state, apiResult: action.payload, users: action.payload, pageCount: pageCountList}
+      const pageCountList = getPageCount(payload.length, state.numberEntries);
+      return { ...state, 
+               apiResult: payload, 
+               users: payload, 
+               pageCount: pageCountList, 
+               currentPage: 1, 
+               filter: '' }
     case userListActions.SET_USERLIST_ENTRIES:
-      return { ...state, numberEntries: action.payload }
+      return { ...state, 
+               numberEntries: payload }
     case userListActions.SET_USERLIST_PAGE:
-      return { ...state, currentPage: action.payload }
+      return { ...state, 
+               currentPage: payload }
     case userListActions.SET_USERLIST_FILTER:
-      const newUsersArray = filterUsers(state.apiResult, action.payload);
+      const newUsersArray = filterUsers(state.apiResult, payload);
       const pageCountFilter = getPageCount(newUsersArray.length, state.numberEntries);
-      return { ...state, filter: action.payload, users: newUsersArray, currentPage: 1, pageCount: pageCountFilter }
+      return { ...state, 
+              filter: payload, 
+              users: newUsersArray, 
+              currentPage: 1, 
+              pageCount: pageCountFilter }
     case userListActions.SET_USERLIST_PAGECOUNT:
-      return { ...state, pageCount: getPageCount(action.payload) }
+      return { ...state, pageCount: getPageCount(payload) }
+    case userListActions.SET_USERLIST_ACTIVE:
+      return { ...state,  
+              apiResult: changeActiveUser(state.apiResult, payload.username, payload.active), 
+              users: changeActiveUser(state.users, payload.username, payload.active)}
     default:
       return state;
   }
@@ -46,6 +63,12 @@ const getPageCount = (size, entries) => {
   const divide = Math.floor(size / entries);
   const remainder =  size % entries;
   return remainder > 0 ? divide+1 : divide;
+}
+
+const changeActiveUser = (userList, username, status) => {
+  return userList.map((user) => {
+    return user.username === username ? { ...user, active: status } : user;
+  });
 }
 
 export { userListActions, userListReducer, userListInitialState };

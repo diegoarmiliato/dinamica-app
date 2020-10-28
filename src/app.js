@@ -45,7 +45,7 @@ function App() {
       <Switch>        
         <Route path="/admin" render={props => secureRoute(props)} />
         <Route path="/auth" render={props => secureRoute(props)} />
-        <Redirect from="/" to="/admin/index" />
+        <Redirect from="/" to="/admin/users" />
       </Switch>
     </BrowserRouter>
   );

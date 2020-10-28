@@ -181,7 +181,7 @@ function Users(props) {
   const handleUserLock = (username, status) => {
     dispatch({ type: 'LOADING_ON'});
     const body = {
-      username: userCreate.username,
+      username: username,
       active: status === 'ativo' ? false : true
     }
     api.put('/users', body)
@@ -189,6 +189,7 @@ function Users(props) {
       if (res.data.status) {
         const msg = status === 'ativo' ? 'bloqueado' : 'desbloqueado';
         toastMessage(toastTypes.success, 'Sucesso', `Usuário ${body.username} ${msg}`);
+        dispatch({ type: userListActions.SET_USERLIST_ACTIVE, payload: { username: username, active: status === 'ativo' ? 'bloqueado' : 'ativo' }})
       } else {
         toastMessage(toastTypes.error, 'Erro', res.data.message);
       }
