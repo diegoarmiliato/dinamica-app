@@ -35,7 +35,7 @@ import { Context } from "./../../store";
 import { api } from "assets/tools/api";
 import { toastTypes, toastMessage } from "components/Sidebar/Toast";
 
-function Users(props) {
+function Users() {
 
   const { state, dispatch } = useContext(Context);
 
@@ -46,7 +46,8 @@ function Users(props) {
   }
 
   const queryUsers = () => {
-    dispatch({ type: 'LOADING_ON'})
+    console.log(state.loading);
+    dispatch({ type: 'LOADING_ON'});
     api.get('/users')
     .then((res) => {   
       if (res.data.status) {    
@@ -62,7 +63,9 @@ function Users(props) {
   }
 
   useEffect(() => {
-    queryUsers();
+    if (userList.apiResult.length === 0) {
+      queryUsers();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -288,7 +291,7 @@ function Users(props) {
                   <Col xs="8">
                     <h3 className="mb-0">Lista de Usuários</h3>
                   </Col>
-                  {/* <Col> */}
+                  <Col xs="3">
                     <div className="form-inline">
                       <div className="input-group-alternative input-group">
                         <span className="input-group-text">
@@ -297,9 +300,12 @@ function Users(props) {
                         <Input id="input-search" placeholder="Search" type="text" value={userList.filter} onChange={handleInputChange}/>
                       </div>                  
                     </div>
-                  {/* </Col> */}
+                  </Col>
+                  <Col xs="0.5">
+                    <i className="noUi-target fas fa-sync-alt" onClick={() => queryUsers()} /> 
+                  </Col>
                 </Row>             
-              </CardHeader>
+              </CardHeader>              
               <Table className="align-items-center table-flush" size="sm" hover responsive>
                 <thead className="thead-light">
                   <tr>

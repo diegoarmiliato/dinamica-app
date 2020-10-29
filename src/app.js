@@ -18,8 +18,9 @@ function App() {
   useEffect(() => {
     api.post('/login')
     .then((res) => {      
+      dispatch({ type: 'LOADING_OFF'});
       if (res.data.status) {    
-        if (res.data.orgUnit === 'Funcionarios') {    
+        if (res.data.orgUnit === 'Funcionarios') {
           dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, firstName: res.data.firstName, lastName: res.data.lastName} });
           dispatch({ type: loginActions.SET_LOGIN_PASSWORD, payload: ''});
         } else {
@@ -29,8 +30,10 @@ function App() {
         }
       }
     })
-    .catch((err) => toastMessage(toastTypes.error, 'Erro', err.message))
-    .finally(() => dispatch({ type: 'LOADING_OFF'}));
+    .catch((err) => {
+      dispatch({ type: 'LOADING_OFF'});
+      toastMessage(toastTypes.error, 'Erro', err.message)
+    });
     // dispatch({ type: 'LOADING_OFF'});
   }, [dispatch]);
 
