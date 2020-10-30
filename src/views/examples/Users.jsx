@@ -244,6 +244,10 @@ function Users() {
     display: 'none'
   }
 
+  const stylePassword = {
+    webkitTextSecurity: 'disc'
+  }
+
   return (
     <>
       <Header />
@@ -301,7 +305,7 @@ function Users() {
                         <Col lg="6">
                           <FormGroup>
                             <label className="form-control-label" htmlFor="input-password">Senha</label>
-                            <Input id="input-password" name="crtform-password" type="password" placeholder="senha" 
+                            <Input id="input-password" name="crtform-password" type="text" placeholder="senha" style={stylePassword}
                                    value={userCreate.password} onChange={handleInputChange} autoComplete="new-password"
                                    invalid={!userCreate.validPass} valid={!userCreate.validPass}/>
                             <FormFeedback style={formFeedbackStyle} tooltip>A senha é obrigatória</FormFeedback>

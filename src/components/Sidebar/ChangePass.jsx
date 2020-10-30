@@ -51,16 +51,21 @@ function ChangePass(props) {
     display: 'none'
   }
 
+  const stylePassword = {
+    webkitTextSecurity: 'disc'
+  }
+
   return (
     <div>      
       <Modal isOpen={userChange.changePassModal} toggle={() => toggle()}>
         <ModalHeader toggle={() => toggle()}>Alterar Senha</ModalHeader>
-        <Form autoComplete="new-off" onSubmit={handleSubmit}>  
+        <Input name="Fake_Password" id="Fake_Password" type="password" placeholder="password" autoComplete="password" style={styleNone}/>
+        <Form autoComplete="off" onSubmit={handleSubmit}>  
           <ModalBody>          
-            <FormGroup>
-              <Input name="Fake_Password" id="Fake_Password" type="password" placeholder="password" autoComplete="password" style={styleNone}/>
-              <Input id="input-password" name="change-password" type="password" placeholder="senha"
-                     value={userChange.newPassword} onChange={handleInputChange}/>
+            <FormGroup>              
+              <Input id="input-password" name="change-password" type="text" placeholder="senha" style={stylePassword}
+                     value={userChange.newPassword} onChange={handleInputChange}
+                     autoComplete="new-newPassword"/>
               <FormFeedback tooltip>A senha é obrigatória</FormFeedback>
             </FormGroup>          
           </ModalBody>
