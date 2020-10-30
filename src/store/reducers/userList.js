@@ -14,7 +14,7 @@ const userListInitialState = {
   numberEntries: 10,
   currentPage: 1,
   pageCount: 1,
-  filter: '',  
+  filter: ''
 }
 
 const userListReducer = (state, action) => {

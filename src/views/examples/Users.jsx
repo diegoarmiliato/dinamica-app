@@ -2,6 +2,7 @@
 import React, { useContext, useEffect } from "react";
 import { userCreateActions } from 'store/reducers/userCreate';
 import { userListActions } from 'store/reducers/userList';
+import { userChangeActions } from 'store/reducers/userChange';
 
 // reactstrap components
 import {
@@ -34,12 +35,13 @@ import Header from "components/Headers/Header.js";
 import { Context } from "./../../store";
 import { api } from "assets/tools/api";
 import { toastTypes, toastMessage } from "components/Sidebar/Toast";
+import { ChangePass } from "components/Sidebar/ChangePass";
 
 function Users() {
 
   const { state, dispatch } = useContext(Context);
 
-  const { userCreate, userList } = state;
+  const { userCreate, userList, userChange } = state;
 
   const formFeedbackStyle = {
     position: 'inherit'
@@ -222,6 +224,10 @@ function Users() {
     .finally(() => dispatch({ type: 'LOADING_OFF'}));   
   }
 
+  const handlePasswordChange = (username) => {
+    dispatch({ type: userChangeActions.SET_USERLIST_PASSWORDPOPUP, payload: username});
+  }
+
   const widthColumns = {
     username: { width: '15%' },
     firstName: { width: '20%' },
@@ -234,9 +240,16 @@ function Users() {
     width: '100%'
   }
 
+  const styleNone = {
+    display: 'none'
+  }
+
   return (
     <>
       <Header />
+      <ChangePass/>
+      <Input name="Fake_Username" id="Fake_Username" type="text" placeholder="username" autoComplete="username" style={styleNone}/>
+      <Input name="Fake_Password" id="Fake_Password" type="password" placeholder="password" autoComplete="password" style={styleNone}/>
       {/* Page content */}
       <Container className="mt--7" fluid>
         {/* Table */}
@@ -320,7 +333,8 @@ function Users() {
                         <span className="input-group-text">
                           <i className="fas fa-search" />                          
                         </span>                      
-                        <Input id="input-search" placeholder="Search" type="text" value={userList.filter} onChange={handleInputChange}/>
+                        <Input id="input-search" placeholder="Pesquisa" type="search" value={userList.filter} 
+                               onChange={handleInputChange} autoComplete="off"/>
                       </div>                  
                     </div>
                   </Col>
@@ -365,7 +379,7 @@ function Users() {
                               </DropdownToggle>
                               <DropdownMenu className="dropdown-menu-arrow" right>
                                 <DropdownItem onClick={() => handleUserLock(user.username, user.active)}>{user.active === 'ativo' ? 'Bloquear' : 'Ativar'}</DropdownItem>
-                                <DropdownItem onClick={() => handleUserDeletion(user.username)}>Alterar Senha</DropdownItem>
+                                <DropdownItem onClick={() => handlePasswordChange(user.username)}>Alterar Senha</DropdownItem>
                                 <DropdownItem onClick={() => handleUserDeletion(user.username)} hidden={true}>Excluir Usuário</DropdownItem>
                               </DropdownMenu>
                             </UncontrolledDropdown>
