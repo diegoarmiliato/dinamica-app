@@ -46,7 +46,6 @@ function Users() {
   }
 
   const queryUsers = () => {
-    console.log(state.loading);
     dispatch({ type: 'LOADING_ON'});
     api.get('/users')
     .then((res) => {   
@@ -203,12 +202,36 @@ function Users() {
     .finally(() => dispatch({ type: 'LOADING_OFF'}));
   }
 
+  const handleUserDeletion = (username) => {
+    dispatch({ type: 'LOADING_ON'});
+    const body = {
+      username: username
+    }
+    api.del('/users', body)
+    .then((res) => {      
+      if (res.data.status) {
+        toastMessage(toastTypes.success, 'Sucesso', `Usuário ${body.username} excluído`);
+        dispatch({ type: userListActions.SET_USERLIST_REMOVE, payload: username });
+      } else {
+        toastMessage(toastTypes.error, 'Erro', res.data.message);
+      }
+    })
+    .catch((err) => {
+      toastMessage(toastTypes.error, 'Erro', err.message);
+    })
+    .finally(() => dispatch({ type: 'LOADING_OFF'}));   
+  }
+
   const widthColumns = {
     username: { width: '15%' },
     firstName: { width: '20%' },
     lastname: { width: '40%' },
     active: { width: '15%' },
     options: { width: '10%' }
+  }
+
+  const widthSearch = {
+    width: '100%'
   }
 
   return (
@@ -288,12 +311,12 @@ function Users() {
           <Card className="shadow">
               <CardHeader className="border-0">
               <Row className="align-items-center">
-                  <Col xs="8">
+                  <Col xl="7" lg="5" xs="11">
                     <h3 className="mb-0">Lista de Usuários</h3>
                   </Col>
-                  <Col xs="3">
+                  <Col xl="4" lg="6" xs="10">
                     <div className="form-inline">
-                      <div className="input-group-alternative input-group">
+                      <div className="input-group-alternative input-group" style={widthSearch}>
                         <span className="input-group-text">
                           <i className="fas fa-search" />                          
                         </span>                      
@@ -301,7 +324,7 @@ function Users() {
                       </div>                  
                     </div>
                   </Col>
-                  <Col xs="0.5">
+                  <Col md="1" xs="1">
                     <i className="noUi-target fas fa-sync-alt" onClick={() => queryUsers()} /> 
                   </Col>
                 </Row>             
@@ -334,7 +357,6 @@ function Users() {
                             <UncontrolledDropdown>
                               <DropdownToggle
                                 className="btn-icon-only text-light"
-                                href="#pablo"
                                 role="button"
                                 size="sm"
                                 color=""
@@ -342,8 +364,9 @@ function Users() {
                                 <i className="fas fa-ellipsis-v" />
                               </DropdownToggle>
                               <DropdownMenu className="dropdown-menu-arrow" right>
-                                <DropdownItem href="#pablo" onClick={() => handleUserLock(user.username, user.active)}>{user.active === 'ativo' ? 'Bloquear' : 'Ativar'}</DropdownItem>
-                                <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>Alterar Senha</DropdownItem>
+                                <DropdownItem onClick={() => handleUserLock(user.username, user.active)}>{user.active === 'ativo' ? 'Bloquear' : 'Ativar'}</DropdownItem>
+                                <DropdownItem onClick={() => handleUserDeletion(user.username)}>Alterar Senha</DropdownItem>
+                                <DropdownItem onClick={() => handleUserDeletion(user.username)} hidden={true}>Excluir Usuário</DropdownItem>
                               </DropdownMenu>
                             </UncontrolledDropdown>
                           </td>
@@ -355,7 +378,7 @@ function Users() {
                 <nav aria-label="...">
                   <Pagination className="pagination justify-content-end mb-0" listClassName="justify-content-end mb-0">
                     <PaginationItem className={userList.currentPage === 1 ? 'disabled' : 'enabled'}>
-                      <PaginationLink href="#pablo" onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: userList.currentPage-1})} tabIndex="-1">
+                      <PaginationLink onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: userList.currentPage-1})} tabIndex="-1">
                         <i className="fas fa-angle-left" />
                         <span className="sr-only">Previous</span>
                       </PaginationLink>
@@ -383,7 +406,7 @@ function Users() {
                       }
                     })}                    
                     <PaginationItem className={userList.currentPage === userList.pageCount ? 'disabled' : 'enabled'}>
-                      <PaginationLink href="#pablo" onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: userList.currentPage+1})}>
+                      <PaginationLink onClick={() => dispatch({ type: userListActions.SET_USERLIST_PAGE, payload: userList.currentPage+1})}>
                         <i className="fas fa-angle-right" />
                         <span className="sr-only">Next</span>
                       </PaginationLink>

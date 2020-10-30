@@ -4,7 +4,8 @@ const userListActions = {
   SET_USERLIST_PAGE: 'SET_USERLIST_PAGE',
   SET_USERLIST_FILTER: 'SET_USERLIST_FILTER',
   SET_USERLIST_PAGECOUNT: 'SET_USERLIST_PAGECOUNT',
-  SET_USERLIST_ACTIVE: 'SET_USERLIST_ACTIVE'
+  SET_USERLIST_ACTIVE: 'SET_USERLIST_ACTIVE',
+  SET_USERLIST_REMOVE: 'SET_USERLIST_REMOVE'
 }
 
 const userListInitialState = {
@@ -47,6 +48,12 @@ const userListReducer = (state, action) => {
       return { ...state,  
               apiResult: changeActiveUser(state.apiResult, payload.username, payload.active), 
               users: changeActiveUser(state.users, payload.username, payload.active)}
+    case userListActions.SET_USERLIST_REMOVE:
+      const apiResultDelete = deleteUser(state.apiResult, payload);
+      const usersDelete = deleteUser(state.users, payload);
+      return { ...state, 
+               apiResult: apiResultDelete,
+               users: usersDelete}
     default:
       return state;
   }
@@ -69,6 +76,10 @@ const changeActiveUser = (userList, username, status) => {
   return userList.map((user) => {
     return user.username === username ? { ...user, active: status } : user;
   });
+}
+
+const deleteUser = (userList, username) => {
+  return userList.filter((user) => user.username !== username);
 }
 
 export { userListActions, userListReducer, userListInitialState };

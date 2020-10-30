@@ -1,3 +1,4 @@
+import { api } from "assets/tools/api";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
@@ -28,6 +29,11 @@ function AdminNavbar(props) {
 
   const avatarStyle = {
     backgroundColor: 'transparent'
+  }
+
+  const logoff = () => {
+    api.post('/logoff'); 
+    dispatch({ type: loginActions.LOGOFF });
   }
 
   return (
@@ -70,7 +76,7 @@ function AdminNavbar(props) {
                 </Media>
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-arrow" right>
-                <DropdownItem href="#pablo" onClick={() => dispatch({ type: loginActions.LOGOFF })}>
+                <DropdownItem onClick={() => logoff()}>
                   <i className="ni ni-user-run" />
                   <span>Logoff</span>
                 </DropdownItem>

@@ -61,6 +61,7 @@ return (
         <Sidebar
           {...props}
           routes={routes}
+          dispatch={dispatch}
           logo={{
             innerLink: "/admin/index",
             imgSrc: require("assets/img/brand/SmallLogo.png"),
