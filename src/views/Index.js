@@ -74,7 +74,6 @@ class Index extends React.Component {
                             className={classnames("py-2 px-3", {
                               active: this.state.activeNav === 1
                             })}
-                            href="#pablo"
                             onClick={e => this.toggleNavs(e, 1)}
                           >
                             <span className="d-none d-md-block">Month</span>
@@ -87,7 +86,6 @@ class Index extends React.Component {
                               active: this.state.activeNav === 2
                             })}
                             data-toggle="tab"
-                            href="#pablo"
                             onClick={e => this.toggleNavs(e, 2)}
                           >
                             <span className="d-none d-md-block">Week</span>
@@ -145,7 +143,6 @@ class Index extends React.Component {
                     <div className="col text-right">
                       <Button
                         color="primary"
-                        href="#pablo"
                         onClick={e => e.preventDefault()}
                         size="sm"
                       >
@@ -223,7 +220,6 @@ class Index extends React.Component {
                     <div className="col text-right">
                       <Button
                         color="primary"
-                        href="#pablo"
                         onClick={e => e.preventDefault()}
                         size="sm"
                       >

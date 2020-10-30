@@ -45,7 +45,7 @@ var routes = [
     icon: "ni ni-single-02 text-yellow",
     component: Profile,
     layout: "/admin",
-    enabled: true
+    enabled: false
   },
   {
     path: "/tables",
