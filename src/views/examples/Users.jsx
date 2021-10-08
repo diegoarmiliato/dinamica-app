@@ -41,7 +41,7 @@ function Users() {
 
   const { state, dispatch } = useContext(Context);
 
-  const { userCreate, userList, userChange } = state;
+  const { userCreate, userList } = state;
 
   const formFeedbackStyle = {
     position: 'inherit'
@@ -50,7 +50,7 @@ function Users() {
   const queryUsers = () => {
     dispatch({ type: 'LOADING_ON'});
     api.get('/users')
-    .then((res) => {   
+    .then((res) => { 
       if (res.data.status) {    
         dispatch({ type: userListActions.SET_USERLIST_FULL, payload: res.data.userList
                                                             .filter((user) => user.orgUnit === 'Alunos')
@@ -245,7 +245,7 @@ function Users() {
   }
 
   const stylePassword = {
-    webkitTextSecurity: 'disc'
+    WebkitTextSecurity: 'disc'
   }
 
   return (

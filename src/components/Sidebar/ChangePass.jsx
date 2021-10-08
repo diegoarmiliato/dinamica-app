@@ -52,7 +52,7 @@ function ChangePass(props) {
   }
 
   const stylePassword = {
-    webkitTextSecurity: 'disc'
+    WebkitTextSecurity: 'disc'
   }
 
   return (

@@ -6,8 +6,8 @@ import { Form, Input, Button, Card, CardBody, FormGroup, Col, InputGroup, InputG
 import { Context } from "store";
 import { loginActions } from "store/reducers/login";
 import { api } from "assets/tools/api";
-import { apiHeaders } from "assets/tools/api";
 import { toastTypes, toastMessage } from "components/Sidebar/Toast";
+import { setAccessToken } from "variables/accessToken";
 
 function Login() {
 
@@ -37,24 +37,15 @@ function Login() {
         const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64')
         const config = {
           headers: {
-            apiHeaders,
             'Authorization': `Basic ${token}`
-          },
-          withCredentials: true
+          }
         }
         api.post('/login', {} ,config)
           .then((res) => {
-            if (res.data.status) {
-              if (res.data.orgUnit === 'Funcionarios') {
-                dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, 
-                  firstName: res.data.firstName, 
-                  lastName: res.data.lastName, 
-                  orgUnit: res.data.orgUnit } });              
-              } else {
-                api.post('/logoff');
-                dispatch({ type: loginActions.LOGOFF});
-                toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
-              }
+            const { token } = res.data;
+            if (res.status === 202 && token) {
+              setAccessToken(token);
+              dispatch({ type: loginActions.LOGIN });
             } else {
               dispatch({ type: loginActions.LOGOFF});  
               toastMessage(toastTypes.error, 'Erro', res.data.message);
