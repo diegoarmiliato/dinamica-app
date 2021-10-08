@@ -4,37 +4,26 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 import { Context } from "store";
-import { api } from "assets/tools/api";
-import { loginActions } from "store/reducers/login";
+import { loginActions } from "./store/reducers/login";
 
 import 'assets/css/app.css';
 import Loading from "views/examples/Loading";
-import { Toast, toastMessage, toastTypes } from "components/Sidebar/Toast";
+import { Toast } from "components/Sidebar/Toast";
+import { authenticate } from "variables/accessToken";
+import { loadingActions } from "./store/reducers/loading";
 
 function App() {
 
   const { state, dispatch } = useContext(Context);
 
   useEffect(() => {
-    api.post('/login')
-    .then((res) => {      
-      dispatch({ type: 'LOADING_OFF'});
-      if (res.data.status) {    
-        if (res.data.orgUnit === 'Funcionarios') {
-          dispatch({ type: loginActions.LOGIN, payload: { username: res.data.username, firstName: res.data.firstName, lastName: res.data.lastName} });
-          dispatch({ type: loginActions.SET_LOGIN_PASSWORD, payload: ''});
-        } else {
-          api.post('/logoff');
-          dispatch({ type: loginActions.LOGOFF});
-          toastMessage(toastTypes.error, 'Erro', 'Usuário não autorizado\nRealizado logoff');
-        }
+    authenticate()
+    .then(data => {
+      if (data) {
+        dispatch({ type: loginActions.LOGIN });          
       }
     })
-    .catch((err) => {
-      dispatch({ type: 'LOADING_OFF'});
-      toastMessage(toastTypes.error, 'Erro', err.message)
-    });
-    // dispatch({ type: 'LOADING_OFF'});
+    .finally(dispatch({ type: loadingActions.LOADING_OFF}));
   }, [dispatch]);
 
   const secureRoute = (props) => {

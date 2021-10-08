@@ -1,3 +1,5 @@
+import { getDecodedToken } from "variables/accessToken";
+
 const loginActions = {
   SET_LOGIN_USERNAME: 'SET_LOGIN_USERNAME',
   SET_LOGIN_PASSWORD: 'SET_LOGIN_PASSWORD',
@@ -28,7 +30,12 @@ const loginReducer = (state, action) => {
       case loginActions.SET_LOGIN_AUTOCOMPLETE:
         return { ...state, autoComplete: payload }      
       case loginActions.LOGIN:
-        return { ...state, loggedOn: true, ...payload }     
+        const { username, firstName, lastName, orgUnit} = getDecodedToken();
+        if (orgUnit === 'Funcionarios') {
+          return { ...state, loggedOn: true, username, firstName, lastName, orgUnit }     
+        } else {
+          return { ...state, loggedOn: false }       
+        }
       case loginActions.LOGOFF:
         return { ...state, loggedOn: false }     
       default:
